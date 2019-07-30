@@ -1,9 +1,8 @@
 Package: utilar
-Title: What the Package Does (one line, title case)
+Title: Personalized utility functions used for my analysis
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-Depends: R (>= 3.4.4)
-License: What license is it under?
+Authors@R: person("Arshi", "Arora", email = "arshiaurora@gmail.com", role = c("aut", "cre"))
+Description: summary tables, univariate tables, styled KM curves and other generic functions
+Depends: survival, coin, plyr
 Encoding: UTF-8
 LazyData: true
