@@ -37,10 +37,10 @@ get.summary<-function(ff,type, type2="range"){
 #association tests of continuous and discrete variables in a neat table format
 
 
-get.summary2<-function(fac,var,type,skip.test=FALSE,para="np", var.n=NULL){
+get.summary2<-function(fac,var,type,para="np",skip.test=FALSE, var.n=NULL){
 
   if(length(fac) != length(var)){ stop("unequal lengths of fac and var")}
-
+  if(type==2){if(length(which(is.na(fac))) !=0){ stop("Factor variable cannot have NA")}}
   #categorical data
   if (type==1){
     fac = as.character(fac)
@@ -77,7 +77,7 @@ get.summary2<-function(fac,var,type,skip.test=FALSE,para="np", var.n=NULL){
     fmat = (cbind(rbind(var.name,xtab),rs,pval))
     colnames(fmat)[which(colnames(fmat)=="rs")] = "RowTotal"
 
-    if(!(is.null(var.null))){ rownames(fmat)[which(rownames(fmat) == "var.name")] = var.n  }
+    if(!(is.null(var.n))){ rownames(fmat)[which(rownames(fmat) == "var.name")] = var.n  }
 
   }
 
@@ -112,26 +112,35 @@ get.summary2<-function(fac,var,type,skip.test=FALSE,para="np", var.n=NULL){
 
     #y is a numeric, x is a factor wilcox_test(y~x)
     #always perform wilcox test for ties
-    if (skip.test==TRUE){
+    if (skip.test==FALSE){
 
       way = length(unique(na.omit(fac)))
       if(way ==1){ stop("fac has only one class of variables to compare? Need atleast 2 levels")}
-      if(way==2 & para =="p"){pval =t.test(var ~ as.factor(fac))$p.value }
-      if(way==2 & para =="np"){ pval = pvalue(wilcox_test(var ~ as.factor(fac)))}
-
-      if(way>2 & para =="p"){ pval = ftest()}
-      if(way>2 & para =="np"){ pval = kruskal.test(var, as.factor(fac))$p.value}
+      if(way==2 & para =="p"){message("Performing T-Test")
+        pval =t.test(var ~ as.factor(fac))$p.value }
+      if(way==2 & para =="np"){ message("Performing Wilcoxon Rank Sum test")
+                                        pval = pvalue(wilcox_test(var ~ as.factor(fac)))}
+      #one way aov
+      if(way>2 & para =="p"){ message("Performing one way ANOVA")
+        pval = summary(aov(var ~ as.factor(fac)))[[1]][[5]][1]}
+      if(way>2 & para =="np"){message("Performing Kruskal-Wallis test")
+        pval = kruskal.test(var, as.factor(fac))$p.value}
 
       pval = ifelse(pval<0.0001, "P<0.0001", round(pval,digits=3))
     }
 
-    if(skip.test==FALSE){ pval = NA}
+    if(skip.test==TRUE){ pval = NA}
 
     fmat = c(fmat,"",pval)
-    names(fmat) = c(cnames,"rs","pval")
-    nas = tt.summary[,4]
+    names(fmat) = c(cnames,"RowTotal","pval")
+    nas = tt.summary[,3]
     fmat = rbind(fmat,c(nas,"",""))
+    rownames(fmat)= c("var.name", "NA")
+
+    if(!(is.null(var.n))){ rownames(fmat)[which(rownames(fmat) == "var.name")] = var.n  }
   }
+
+
 
   return(fmat)
 }
