@@ -21,7 +21,9 @@ replaceNAs(x, vNA)
   Both arguments should be supplied. If \code{typeof} is not matched to one of the following - \code{character, double, integer} or \code{factor}, a \code{character} vector is returned
 }
 \value{
-  \item{x.na} { A vector with misisng values coded as \code{NA}. If \code{typeof} did not match the following - \code{character, double, integer} or \code{factor}, a \code{character} vector is returned }
+
+  \item{x.na}{A vector with misisng values coded as \code{NA}. If \code{typeof} did not match the following - \code{character, double, integer} or \code{factor}, a \code{character} vector is returned }
+
 }
 
 \author{
