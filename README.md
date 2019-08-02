@@ -72,7 +72,7 @@ set.seed(123)
   #col "red" "blue" "green" "orange"
 
 ```
-## get.sumamry
+## get.summary
 A vector based summary function. Provides a table with percentages for dicrete data. And median, mean, range or standard deviation for continuous data.
 
 usage `get.summary(var, type)`
@@ -105,6 +105,72 @@ x[c(1,5,30)] = NA
 
 ```
 ## get.summary2
+Sumamrize and provide p-value after association test of 2 or more variables. Percentages are reported for discrete variables. Users can choose the type of test they want. For continuous variable median and range are reported if the test specifid is non parametric, mean and standard deviation are reported for a parametric test.  For discrete categories we perform Fisher's Exact Test, for continous following options are available - parametric - Students' T-Test or one way ANNOVA, for non-paramteric Wilcoxon Rank sum test or Kruskal Wallis test.
+
+usage - `get.summary2(fac, var, type)`
+
+```{r}
+#example
+#two categorical variables
+set.seed(100)
+fac<-sample(1:2, 50, replace=T)
+var<-sample(1:3, 50, replace=T)
+get.summary2(fac,var, type=1,var.n="Example, Type=1" )
+
+#Performing Fisher's Exact test
+```
+
+|                |1(n=23;46%) |2(n=27;54%) |RowTotal |pval   |
+|:---------------|:-----------|:-----------|:--------|:------|
+|Example, Type=1 |            |            |         |0.5971 |
+|1               |9(39%)      |8(30%)      |17(34%)  |       |
+|2               |7(30%)      |12(44%)     |19(38%)  |       |
+|3               |7(30%)      |7(26%)      |14(28%)  |       |
+
+```{r}
+#continuous with two categories of fac
+var<-rnorm(50)
+get.summary2(fac, var,  type=2, test.type="p", var.n="2-Way, test.type=p")
+
+#Performing T-Test
+```
+
+|                   |1           |2           |RowTotal |pval  |
+|:------------------|:-----------|:-----------|:--------|:-----|
+|2-Way, test.type=p |-0.11(1.42) |-0.05(0.99) |         |0.855 |
+|NA                 |0           |0           |         |      |
+
+```{r}
+get.summary2(fac, var,  type=2, test.type="np", var.n="2-Way, test.type=np")
+#Performing Wilcoxon Rank Sum test
+```
+
+|                    |1                |2                 |RowTotal |pval  |
+|:-------------------|:----------------|:-----------------|:--------|:-----|
+|2-Way, test.type=np |-0.1[-2.27-2.58] |-0.07[-1.93-1.73] |         |0.676 |
+|NA                  |0                |0                 |         |      |
+
+
+```{r}
+fac<-sample(1:3, 50, replace=T)
+get.summary2(fac, var,  type=2, test.type="p",var.n="Example, test.type=p")
+#Performing one way ANOVA
+```
+
+|                     |1           |2          |3         |RowTotal |pval  |
+|:--------------------|:-----------|:----------|:---------|:--------|:-----|
+|Example, test.type=p |-0.46(1.31) |-0.16(0.9) |0.38(1.3) |         |0.132 |
+|NA                   |0           |0          |0         |         |      |
+
+```{r}
+get.summary2(fac, var,  type=2, test.type="np",var.n="Example, test.type=np")
+
+#Performing Kruskal-Wallis test
+```
+|                      |1                 |2                 |3                |RowTotal |pval  |
+|:---------------------|:-----------------|:-----------------|:----------------|:--------|:-----|
+|Example, test.type=np |-0.53[-2.27-2.58] |-0.07[-1.93-1.82] |0.42[-1.74-2.45] |         |0.131 |
+|NA                    |2.58              |1.82              |2.45             |         |      |
 
 
 # References 
