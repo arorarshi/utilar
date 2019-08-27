@@ -2,7 +2,7 @@
 # Survival related functions
 #####################################
 
-my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, mylwd=2,mylcex=1){
+my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, mylwd=2,mylcex=1, med.surv=TRUE){
 
   ff = as.factor(ff)
   km=survfit(Surv(my.os,my.status)~ff)
@@ -12,21 +12,34 @@ my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, m
     #select the correct df for log rank test
     #unique also counts NA
     km.chi= 1 - pchisq(km.stats$chisq, length(na.omit(unique(ff)))-1)
-    if(lr==TRUE){
+    if(lr){
       plot(km,mark.time=T,xlab=paste0("Time ", xlab),col=col,sub = paste0("logrank p-value=",round(km.chi,5)),main=main, lwd=mylwd, lty=mylty, frame.plot =F)
       legend.text = rep(NA, length(legendv))}
 
-    if(lr==FALSE){
+    if(!lr){
       plot(km,mark.time=T,xlab=paste0("Time ", xlab),col=col,main=main, lwd=mylwd, lty=mylty, frame.plot =F)
       legend.text = rep(NA, length(legendv))}
     for (i in 1:length(legendv)){
+
+      if(med.surv){
       legend.text[i] = paste0(legendv[i]," ,Median surv time=",round(summary(km)$table[i,"median"],2)," (n=",summary(km)$table[i,"records"]," events=",summary(km)$table[i,"events"],")")
+      }
+
+      if(!med.surv){
+        legend.text[i] = paste0(legendv[i], "(n=",summary(km)$table[i,"records"]," events=",summary(km)$table[i,"events"],")")
+      }
     }
   }
 
   if( length(unique(ff))==1){
     plot(km,mark.time=T,xlab=paste0("Time ", xlab),col=col,main=main, lwd=mylwd, lty=mylty, frame.plot =F)
+    if(med.surv){
     legend.text = paste0(legendv," ,Median surv time=",round(summary(km)$table["median"],2)," (n=",summary(km)$table["records"]," events=",summary(km)$table["events"],")")
+    }
+
+    if(!med.surv){
+      legend.text = paste0(legendv," (n=",summary(km)$table["records"]," events=",summary(km)$table["events"],")")
+    }
   }
 
   legend("bottomleft",legend.text,col=col,lty=mylty,lwd=2,bty="n",cex=mylcex)
