@@ -32,6 +32,7 @@ type.convert<-function(x,cc){
   if(cc == "factor"){ warning("A typeof factor was returned. check for inconsistencies")
                       return(as.factor(as.character(x))) }
   if(cc == "integer"){return(as.numeric(x))}
+  if(cc == "numeric"){return(as.numeric(x))}
   else{return(as.character(x))}
 }
 
@@ -41,15 +42,15 @@ type.convert<-function(x,cc){
 #get a color vector for a heatmap, panels etc, add grey for missing
 get.colvector<-function(labels,col, NA.flag=FALSE, NA.col="grey"){
 
-  if(NA.flag==FALSE){
+  if(!NA.flag){
     if (length(unique(labels)) != length(col)){ stop("Unequal length of unique labels and color")}
   }
 
-  if(NA.flag==TRUE){
+  if(NA.flag){
     if (length(unique(na.omit(labels))) != length(col)){ stop("Unequal length of unique labels and color")}
   }
 
-  if (NA.flag==TRUE){ inter = intersect(col, NA.col)
+  if (NA.flag){ inter = intersect(col, NA.col)
     if(length(inter)!=0){
       print(paste0("NA.col = ", NA.col," is repeated in col"))
       stop("Choose another color for NA.col")}
@@ -62,7 +63,7 @@ get.colvector<-function(labels,col, NA.flag=FALSE, NA.col="grey"){
   for(i in 1:length(ul)){
     labels.col[as.character(labels)==as.character(ul[i])] = col[i]
   }
-  if(NA.flag==TRUE){labels.col[which(is.na(labels.col))]=NA.col
+  if(NA.flag){labels.col[which(is.na(labels.col))]=NA.col
     ul<-c(ul,"NA")
     col<-c(col, NA.col)}
 
