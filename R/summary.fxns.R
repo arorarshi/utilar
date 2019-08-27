@@ -66,7 +66,7 @@ get.summary2<-function(fac,var,type,test.type="np",skip.test=FALSE, var.n=NULL){
     var.name = rep("", ncol(xtab))
 
     #fisher test handles NA
-    if(skip.test==FALSE){
+    if(!skip.test){
       message("Performing Fisher's Exact test")
       pp = fisher.test(fac,var,workspace=2e8)$p.value
       pp = ifelse(pp<0.0001, "P<0.0001", round(pp,digits=4))
@@ -114,7 +114,7 @@ get.summary2<-function(fac,var,type,test.type="np",skip.test=FALSE, var.n=NULL){
 
     #y is a numeric, x is a factor wilcox_test(y~x)
     #always perform wilcox test for ties
-    if (skip.test==FALSE){
+    if (!skip.test){
 
       way = length(unique(na.omit(fac)))
       if(way ==1){ stop("fac has only one class of variables to compare? Need atleast 2 levels")}
@@ -131,7 +131,7 @@ get.summary2<-function(fac,var,type,test.type="np",skip.test=FALSE, var.n=NULL){
       pval = ifelse(pval<0.0001, "P<0.0001", round(pval,digits=3))
     }
 
-    if(skip.test==TRUE){ pval = NA}
+    if(skip.test){ pval = NA}
 
     fmat = c(fmat,"",pval)
     names(fmat) = c(cnames,"RowTotal","pval")
