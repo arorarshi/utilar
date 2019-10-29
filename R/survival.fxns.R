@@ -2,7 +2,7 @@
 # Survival related functions
 #####################################
 
-my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, med.surv=TRUE, ...){
+my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, med.surv=TRUE,mylcex=1, ...){
 
   ff = as.factor(ff)
   km=survfit(Surv(my.os,my.status)~ff)
@@ -42,7 +42,7 @@ my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, m
     }
   }
 
-  legend("bottomleft",legend.text,col=col,lty=mylty,lwd=2,bty="n")
+  legend("bottomleft",legend.text,col=col,lty=mylty,lwd=2,bty="n", cex=mylcex)
 }
 
 
