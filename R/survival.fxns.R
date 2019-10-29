@@ -2,7 +2,7 @@
 # Survival related functions
 #####################################
 
-my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, mylwd=2,mylcex=1, med.surv=TRUE){
+my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, med.surv=TRUE, ...){
 
   ff = as.factor(ff)
   km=survfit(Surv(my.os,my.status)~ff)
@@ -13,11 +13,11 @@ my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, m
     #unique also counts NA
     km.chi= 1 - pchisq(km.stats$chisq, length(na.omit(unique(ff)))-1)
     if(lr){
-      plot(km,mark.time=T,xlab=paste0("Time ", xlab),col=col,sub = paste0("logrank p-value=",round(km.chi,5)),main=main, lwd=mylwd, lty=mylty, frame.plot =F)
+      plot(km,mark.time=T,xlab=paste0("Time ", xlab),col=col,sub = paste0("logrank p-value=",round(km.chi,5)),main=main, lty=mylty, frame.plot =F, ...)
       legend.text = rep(NA, length(legendv))}
 
     if(!lr){
-      plot(km,mark.time=T,xlab=paste0("Time ", xlab),col=col,main=main, lwd=mylwd, lty=mylty, frame.plot =F)
+      plot(km,mark.time=T,xlab=paste0("Time ", xlab),col=col,main=main,  lty=mylty, frame.plot =F, ...)
       legend.text = rep(NA, length(legendv))}
     for (i in 1:length(legendv)){
 
@@ -32,7 +32,7 @@ my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, m
   }
 
   if( length(unique(ff))==1){
-    plot(km,mark.time=T,xlab=paste0("Time ", xlab),col=col,main=main, lwd=mylwd, lty=mylty, frame.plot =F)
+    plot(km,mark.time=T,xlab=paste0("Time ", xlab),col=col,main=main, lty=mylty, frame.plot =F, ...)
     if(med.surv){
     legend.text = paste0(legendv," ,Median surv time=",round(summary(km)$table["median"],2)," (n=",summary(km)$table["records"]," events=",summary(km)$table["events"],")")
     }
@@ -42,7 +42,7 @@ my.plot.km<-function(ff,my.os,my.status,xlab,legendv,col,main,mylty=1,lr=TRUE, m
     }
   }
 
-  legend("bottomleft",legend.text,col=col,lty=mylty,lwd=2,bty="n",cex=mylcex)
+  legend("bottomleft",legend.text,col=col,lty=mylty,lwd=2,bty="n")
 }
 
 
