@@ -11,12 +11,13 @@
 #continuous - median(range) or median(sd)
 #discrete - tabbulate
 
-get.summary<-function(var,type, type2="range"){
+get.summary<-function(var, var.n="variable",type, type2="range"){
   if(type==1){
     #discrete
     tt = table(as.character(var),useNA="ifany")
     ttf = round(prop.table(tt)*100,2)
     summary = mapply( function(x,y) paste0(x,"(",y,"%)"),tt,ttf)
+    summary = as.matrix(summary); colnames(summary) = var.n
     return(summary)
   }
 
