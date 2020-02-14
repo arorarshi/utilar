@@ -6,31 +6,37 @@
 ##################################
 
 
+
 ##################################
 #summarize vector values, can be discrete or continuous.
 #continuous - median(range) or median(sd)
 #discrete - tabbulate
 
-get.summary<-function(var, var.n="variable",type, type2="range"){
+get.summary<-function(var,type, var.n=NULL, type2="range"){
   if(type==1){
     #discrete
     tt = table(as.character(var),useNA="ifany")
     ttf = round(prop.table(tt)*100,2)
     summary = mapply( function(x,y) paste0(x,"(",y,"%)"),tt,ttf)
-    summary = as.matrix(summary); colnames(summary) = var.n
+    summary = as.matrix(summary); rownames(summary)[1] = paste0(var.n, "=", rownames(summary)[1])
     return(summary)
   }
 
   if(type==2){
     #continuous
+    if(length(var) ==1){warning("trying to summarize only 1 variable")}
     var = as.numeric(as.character(var))
     median.value = round(median(var, na.rm=T),2)
     if(type2=="range"){
       range.value = round(range(var, na.rm=T),2)
-      return(paste0(median.value,"(",range.value[1],"-",range.value[2] ,"); NA=",length(which(is.na(var))) ))}
+      tt = paste0(median.value,"(",range.value[1],",",range.value[2] ,"); NA=",length(which(is.na(var))) )}
     if(type2=="sd"){
       sd.value = round(sd(var, na.rm=T),2)
-      return(paste0(median.value,"(",sd.value,"); NA=",length(which(is.na(var))) ))}
+      tt=paste0(median.value,"(",sd.value,"); NA=",length(which(is.na(var))) )}
+
+    tt=as.matrix(tt)
+    rownames(tt) = var.n
+    return(tt)
   }
 }
 
@@ -67,7 +73,7 @@ get.summary2<-function(fac,var,type,test.type="np",skip.test=FALSE, var.n=NULL){
     var.name = rep("", ncol(xtab))
 
     #fisher test handles NA
-    if(!skip.test){
+    if(skip.test==FALSE){
       message("Performing Fisher's Exact test")
       pp = fisher.test(fac,var,workspace=2e8)$p.value
       pp = ifelse(pp<0.0001, "P<0.0001", round(pp,digits=4))
@@ -98,9 +104,9 @@ get.summary2<-function(fac,var,type,test.type="np",skip.test=FALSE, var.n=NULL){
     }
 
     if(test.type=="np"){
-      tt.summary = ddply(mm, c("fac"), summarize, median=median(var,na.rm=T),
-                      min=range(var,na.rm=T)[1],
-                      max=range(var,na.rm=T)[2], NAs = length(which(is.na(var))) )
+      tt.summary = plyr::ddply(mm, c("fac"), summarize, median=median(var,na.rm=T),
+                               min=range(var,na.rm=T)[1],
+                               max=range(var,na.rm=T)[2], NAs = length(which(is.na(var))) )
     }
 
 
@@ -115,14 +121,14 @@ get.summary2<-function(fac,var,type,test.type="np",skip.test=FALSE, var.n=NULL){
 
     #y is a numeric, x is a factor wilcox_test(y~x)
     #always perform wilcox test for ties
-    if (!skip.test){
+    if (skip.test==FALSE){
 
       way = length(unique(na.omit(fac)))
       if(way ==1){ stop("fac has only one class of variables to compare? Need atleast 2 levels")}
       if(way==2 & test.type =="p"){message("Performing T-Test")
         pval =t.test(var ~ as.factor(fac))$p.value }
       if(way==2 & test.type =="np"){ message("Performing Wilcoxon Rank Sum test")
-                                        pval = pvalue(wilcox_test(var ~ as.factor(fac)))}
+        pval = coin::pvalue(coin::wilcox_test(var ~ as.factor(fac)))}
       #one way aov
       if(way>2 & test.type =="p"){ message("Performing one way ANOVA")
         pval = summary(aov(var ~ as.factor(fac)))[[1]][[5]][1]}
@@ -132,7 +138,7 @@ get.summary2<-function(fac,var,type,test.type="np",skip.test=FALSE, var.n=NULL){
       pval = ifelse(pval<0.0001, "P<0.0001", round(pval,digits=3))
     }
 
-    if(skip.test){ pval = NA}
+    if(skip.test==TRUE){ pval = NA}
 
     fmat = c(fmat,"",pval)
     names(fmat) = c(cnames,"RowTotal","pval")
@@ -143,13 +149,5 @@ get.summary2<-function(fac,var,type,test.type="np",skip.test=FALSE, var.n=NULL){
     if(!(is.null(var.n))){ rownames(fmat)[which(rownames(fmat) == "var.name")] = var.n  }
   }
 
-
-
   return(fmat)
 }
-
-
-#take in a list of results after get.summary2, and sort them according to pvalue
-sort.get.summary<-function(){}
-
-
