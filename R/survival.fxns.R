@@ -51,7 +51,7 @@ uvar.surv<-function(time, event,group.var,varname, type){
   time<-as.numeric(as.character(time))
   event<-as.numeric(as.character(event))
 
-  if(type==1){group.var<-as.factor(as.character(group.var))}
+  #if(type==1){group.var<-as.factor(as.character(group.var))}
   if(type==2){group.var<-as.numeric(as.character(group.var))}
 
   xx = table(group.var)
