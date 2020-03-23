@@ -95,7 +95,7 @@ uvar.surv<-function(time, event,group.var,varname, type){
 
 }
 
-mvar.surv<-function(time, event,group.var,varname, data, modelp=FALSE, anovap=FALSE, type="III"){
+mvar.surv<-function(time, event,group.var,varname=NULL, data, modelp=FALSE, anovap=FALSE, type="III"){
 
   if(is.null(varname)){varname = group.var}
   dep.x = paste(group.var, collapse="+")
@@ -123,22 +123,24 @@ mvar.surv<-function(time, event,group.var,varname, data, modelp=FALSE, anovap=FA
 
   }
 
-  rownames(fmat) <- NULL; colnames(fmat) = c(paste0("group n=(", ttcox$n, ",events=", ttcox$nevent), "HR", "95% CI", "P-value")
+  colnames(fmat) = c(paste0("group n=(", ttcox$n, ",events=", ttcox$nevent, ")"), "HR", "95% CI", "P-value")
   if(modelp){ tt = rep("", ncol(fmat))
-  mp = sumamry(ttcox)$logtest["pvalue"]
+  mp = ttcox$logtest["pvalue"]
   mp = ifelse(mp >= 0.001, round(mp,4), "P<0.001")
   tt[1] = paste0("Model p-val = ",mp)
   fmat = rbind(fmat,tt)
   }
 
   if(anovap){
-    ap = Anova(coxph(as.formula(formu), data=data), type=type)
+    ap = car::Anova(coxph(as.formula(formu), data=data), type=type)
     overall.p = rep("", nrow(fmat))
     for(i in 1:length(group.var)){
       idx = which(fmat[,1] == group.var[i])
-      overall.p[idx] = ap$`Pr(>|Chi|)`[i]
+      overall.p[idx] = ifelse(ap$`Pr(>|Chi|)`[i+1] >= 0.001,round(ap$`Pr(>|Chi|)`[i+1],4), "P<0.001")
+
       }
-    fmat = rbind(fmat, overall.p)
+    fmat = cbind(fmat, overall.p)
   }
+  rownames(fmat) <- NULL
   return(fmat)
 }
