@@ -68,11 +68,13 @@ uvar.surv<-function(time, event,group.var,varname, type){
       cicox<-round(ttcox$conf.int,2)
 
       final[2:nrow(final),3] =mapply( function(x,y,z) paste0(x,"[",y,"-",z,"]"), cicox[,1], cicox[,3],cicox[,4])
-      final[2:nrow(final),4] <- round(ttcox$coefficients[,5],4)
+      final[2:nrow(final),4] <- ifelse( ttcox$coefficients[,5]< 0.0001, "P<0.0001", round(ttcox$coefficients[,5],4))
 
       final = rbind(rep("",4),final)
+      final[1,4] = ifelse( ttcox$logtest[3]< 0.0001, "P<0.0001",  round(ttcox$logtest[3],4))
+
       colnames(final) = c("N(events)","Median(95%CI)","HR(95%CI)","p-value")
-      rownames(final) = c(varname,rownames(kkt))
+      rownames(final) =  gsub("group.var=", "",c(varname,rownames(kkt)))
       return(final)}
 
 
@@ -81,7 +83,7 @@ uvar.surv<-function(time, event,group.var,varname, type){
       final[1,1] = paste0(ttcox$n,"(",ttcox$nevent,")" )
       cicox<-round(ttcox$conf.int,2)
       final[1,3] = paste0(cicox[,"exp(coef)"],"(",cicox[,"lower .95"],"-", cicox[,"upper .95"],")" )
-      final[1,4] = round(ttcox$coefficients[,5],4)
+      final[1,4] = ifelse( ttcox$coefficients[,5]< 0.0001, "P<0.0001", round(ttcox$coefficients[,5],4))
       colnames(final) = c("N(events)","Median(95%CI)","HR(95%CI)","p-value")
       rownames(final) = c(varname)
       return(final)
@@ -91,4 +93,52 @@ uvar.surv<-function(time, event,group.var,varname, type){
 
   if(length(xx) == 1){ return(matrix(NA,nrow=1,ncol=4))}
 
+}
+
+mvar.surv<-function(time, event,group.var,varname, data, modelp=FALSE, anovap=FALSE, type="III"){
+
+  if(is.null(varname)){varname = group.var}
+  dep.x = paste(group.var, collapse="+")
+  dep.y = paste0("Surv(", time, ",", event, ")")
+  formu = paste(dep.y , dep.x, sep="~")
+
+  ttcox = summary(coxph(as.formula(formu), data=data))
+
+  mat.hr = round(ttcox$coefficients[,2],3); mat.p = ttcox$coefficients[,5]
+  mat.p.round = sapply(mat.p, function(x) ifelse(x >= 0.001, round(x,4), "P<0.001"))
+  mat.conf = round(ttcox$conf.int[,c(3:4)],3)
+
+  cicox<- paste0("(",mat.conf[,"lower .95"],"-", mat.conf[,"upper .95"],")" )
+
+  fmat = NULL
+  for(i in 1:length(group.var)){
+
+    idx = grep(group.var[i], names(mat.hr), fixed=T)
+    tt = cbind(mat.hr[idx], cicox[idx], mat.p.round[idx])
+    rtt = c(gsub(group.var[i], "", names(mat.hr)[idx]))
+
+    gtt = rep("", 4); gtt[1] = varname[i]
+
+    fmat = rbind(fmat, rbind(gtt, cbind(rtt, tt)))
+
+  }
+
+  rownames(fmat) <- NULL; colnames(fmat) = c(paste0("group n=(", ttcox$n, ",events=", ttcox$nevent), "HR", "95% CI", "P-value")
+  if(modelp){ tt = rep("", ncol(fmat))
+  mp = sumamry(ttcox)$logtest["pvalue"]
+  mp = ifelse(mp >= 0.001, round(mp,4), "P<0.001")
+  tt[1] = paste0("Model p-val = ",mp)
+  fmat = rbind(fmat,tt)
+  }
+
+  if(anovap){
+    ap = Anova(coxph(as.formula(formu), data=data), type=type)
+    overall.p = rep("", nrow(fmat))
+    for(i in 1:length(group.var)){
+      idx = which(fmat[,1] == group.var[i])
+      overall.p[idx] = ap$`Pr(>|Chi|)`[i]
+      }
+    fmat = rbind(fmat, overall.p)
+  }
+  return(fmat)
 }
