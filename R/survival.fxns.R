@@ -136,7 +136,7 @@ mvar.surv<-function(time, event,group.var,varname=NULL, data, modelp=FALSE, anov
     overall.p = rep("", nrow(fmat))
     for(i in 1:length(group.var)){
       idx = which(fmat[,1] == group.var[i])
-      overall.p[idx] = ifelse(ap$`Pr(>|Chi|)`[i+1] >= 0.001,round(ap$`Pr(>|Chi|)`[i+1],4), "P<0.001")
+      overall.p[idx] = ifelse(ap[4][2,1] >= 0.001,round(ap$`Pr(>|Chi|)`[i+1],4), "P<0.001")
 
       }
     fmat = cbind(fmat, overall.p)
