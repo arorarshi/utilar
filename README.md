@@ -1,3 +1,7 @@
+<!-- badges: start -->
+  [![Travis build status](https://travis-ci.org/arorarshi/utilar.svg?branch=master)](https://travis-ci.org/arorarshi/utilar)
+  <!-- badges: end -->
+  
 # utilar
 utilArshi suite of functions 
 

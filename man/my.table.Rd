@@ -35,10 +35,10 @@ Arshi Arora
 \examples{
 
 set.seed(123)
-x<-sample(1:4, 20, replace=T)
+x<-sample(1:4, 20, replace=TRUE)
 names(x)=paste0("sample",1:length(x))
 
-y<-sample(1:4, 25, replace=T)
+y<-sample(1:4, 25, replace=TRUE)
 names(y)=paste0("sample",1:length(y))
 
 my.table(x,y)
