@@ -113,7 +113,7 @@ get.summary2<-function(fac,var,type,test.type="np",skip.test=FALSE, var.n=NULL){
 
     cnames = as.character(tt.summary[,1])
     csum = table(fac); csum = csum[cnames]
-    cnames = mapply(function(a,b) paste0(a,"(n=",b,";", round(((b/sum(csum)) * 100),2), "%)"),colnames(x), csum)
+    cnames = mapply(function(a,b) paste0(a,"(n=",b,";", round(((b/sum(csum)) * 100),2), "%)"),names(csum), csum)
 
     tt.summary = tt.summary[,-1]
     tt.summary = apply(tt.summary, 2,function(x) round(as.numeric(as.character(x)),2))
