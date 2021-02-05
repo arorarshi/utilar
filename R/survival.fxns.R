@@ -71,7 +71,7 @@ uvar.surv<-function(time, event,group.var,varname, type){
       final[2:nrow(final),4] <- ifelse( ttcox$coefficients[,5]< 0.0001, "P<0.0001", round(ttcox$coefficients[,5],4))
 
       final = rbind(rep("",4),final)
-      final[1,4] = ifelse( ttcox$logtest[3]< 0.0001, "P<0.0001",  round(ttcox$logtest[3],4))
+      final[1,4] = ifelse( ttcox$sctest[3]< 0.0001, "P<0.0001",  round(ttcox$sctest[3],4))
 
       colnames(final) = c("N(events)","Median(95%CI)","HR(95%CI)","p-value")
       rownames(final) =  gsub("group.var=", "",c(varname,rownames(kkt)))
